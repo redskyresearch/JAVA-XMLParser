@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class XMLParser {
@@ -70,13 +71,16 @@ public class XMLParser {
 
                     // Create row and add data
                     Row row = sheet.createRow(rowIndex++);
-                    row.createCell(0).setCellValue(title);
                     
-                    // Extract number from title if exists
+                    // Extract first word from title
                     String number = extractNumber(title);
+                    String updatedTitle = title;
                     if (number != null) {
+                        updatedTitle = title.substring(number.length()).trim();
                         row.createCell(1).setCellValue(number);
                     }
+                    
+                    row.createCell(0).setCellValue(updatedTitle);
                     
                     if (videoLink != null) {
                         row.createCell(2).setCellValue(videoLink);
@@ -127,21 +131,33 @@ public class XMLParser {
     private static String extractNumber(String title) {
         if (title == null) return null;
         
-        // First try to get the character before first whitespace
-        Pattern firstCharPattern = Pattern.compile("^(\\S)(?=\\s)");
-        Matcher firstCharMatcher = firstCharPattern.matcher(title);
-        
-        if (firstCharMatcher.find()) {
-            return firstCharMatcher.group(1);
-        }
-        
-        // If no match found, fall back to finding any number
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(title);
-        
-        if (matcher.find()) {
-            return matcher.group(0);
+        // Split the title by whitespace and get the first word
+        String[] words = title.trim().split("\\s+", 2);
+        if (words.length > 0) {
+            return words[0];
         }
         return null;
+    }
+
+    private void processNode(Node node) {
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            Element element = (Element) node;
+            
+            // Get and process the title field
+            NodeList titleNodes = element.getElementsByTagName("title");
+            if (titleNodes.getLength() > 0) {
+                String titleContent = titleNodes.item(0).getTextContent().trim();
+                String[] titleParts = titleContent.split("\\s+", 2);
+                
+                // Extract first word for number column
+                if (titleParts.length > 0) {
+                    element.getElementsByTagName("number").item(0).setTextContent(titleParts[0]);
+                    
+                    // Update title with remaining text or empty string if only one word
+                    String newTitle = titleParts.length > 1 ? titleParts[1].trim() : "";
+                    titleNodes.item(0).setTextContent(newTitle);
+                }
+            }
+        }
     }
 } 
