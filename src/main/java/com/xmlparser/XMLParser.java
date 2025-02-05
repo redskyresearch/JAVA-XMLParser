@@ -45,8 +45,8 @@ public class XMLParser {
                 
                 // Create header row
                 Row headerRow = sheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Title");
-                headerRow.createCell(1).setCellValue("Number");
+                headerRow.createCell(0).setCellValue("Number");
+                headerRow.createCell(1).setCellValue("Subject");
                 headerRow.createCell(2).setCellValue("Video Link");
 
                 // Parse XML file
@@ -77,10 +77,10 @@ public class XMLParser {
                     String updatedTitle = title;
                     if (number != null) {
                         updatedTitle = title.substring(number.length()).trim();
-                        row.createCell(1).setCellValue(number);
+                        row.createCell(0).setCellValue(number);
                     }
                     
-                    row.createCell(0).setCellValue(updatedTitle);
+                    row.createCell(1).setCellValue(updatedTitle);
                     
                     if (videoLink != null) {
                         row.createCell(2).setCellValue(videoLink);
