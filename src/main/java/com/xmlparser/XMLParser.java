@@ -46,8 +46,9 @@ public class XMLParser {
                 // Create header row
                 Row headerRow = sheet.createRow(0);
                 headerRow.createCell(0).setCellValue("Number");
-                headerRow.createCell(1).setCellValue("Subject");
-                headerRow.createCell(2).setCellValue("Video Link");
+                headerRow.createCell(1).setCellValue("Date");
+                headerRow.createCell(2).setCellValue("Subject");
+                headerRow.createCell(3).setCellValue("Video Link");
 
                 // Parse XML file
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -65,6 +66,8 @@ public class XMLParser {
                     // Get title
                     String title = getElementText(entry, "title");
                     
+                    String updated = getElementText(entry, "updated");
+
                     // Get content and extract YouTube link
                     String content = getElementText(entry, "content");
                     String videoLink = extractYoutubeLink(content);
@@ -79,16 +82,16 @@ public class XMLParser {
                         updatedTitle = title.substring(number.length()).trim();
                         row.createCell(0).setCellValue(number);
                     }
-                    
-                    row.createCell(1).setCellValue(updatedTitle);
+                    row.createCell(1).setCellValue(updated);                    
+                    row.createCell(2).setCellValue(title);
                     
                     if (videoLink != null) {
-                        row.createCell(2).setCellValue(videoLink);
+                        row.createCell(3).setCellValue(videoLink);
                     }
                 }
 
                 // Auto-size columns
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 4; i++) {
                     sheet.autoSizeColumn(i);
                 }
 
